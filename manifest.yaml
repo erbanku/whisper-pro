@@ -1,0 +1,28 @@
+version: "0.0.1"
+type: "plugin"
+author: "erbanku"
+name: "whisper-pro"
+label:
+  en_US: "Whisper Pro"
+description:
+  en_US: "Transcribe audio or video from Dify files or URLs with bundled FFmpeg and configurable Whisper-compatible endpoints."
+icon: "icon.svg"
+resource:
+  memory: 536870912
+  permission:
+    tool:
+      enabled: true
+plugins:
+  tools:
+    - "provider/whisper_pro.yaml"
+meta:
+  version: "0.0.1"
+  arch:
+    - "amd64"
+  runner:
+    language: "python"
+    version: "3.12"
+    entrypoint: "main"
+created_at: "2026-09-06T08:44:12Z"
+tags:
+  - "utilities"

@@ -1,0 +1,183 @@
+identity:
+  author: "erbanku"
+  name: "transcribe"
+  label:
+    en_US: "Transcribe Audio or Video"
+description:
+  human:
+    en_US: "transcribe"
+  llm: "Transcribe one native Dify media file or HTTP(S) media URL. Choose exactly one input. Automatically extracts speech audio from video and converts non-passthrough formats with bundled FFmpeg. Returns transcript text plus structured JSON and any server-provided segments/words. Model and endpoint are configurable."
+parameters:
+  - name: "file"
+    type: "file"
+    required: false
+    label:
+      en_US: "Audio / Video File"
+    form: "form"
+    human_description:
+      en_US: "One native Dify file. Leave Media URL empty when using this input."
+  - name: "media_url"
+    type: "string"
+    required: false
+    label:
+      en_US: "Media URL"
+    form: "llm"
+    human_description:
+      en_US: "Direct HTTP(S) audio/video download URL; leave File empty."
+    llm_description: "Direct downloadable media URL, not a webpage or streaming playlist. Mutually exclusive with the native file input."
+  - name: "endpoint"
+    type: "string"
+    required: true
+    label:
+      en_US: "Transcription Endpoint"
+    form: "form"
+    human_description:
+      en_US: "Full transcription URL reachable from the Dify plugin runtime."
+    default: "http://host.docker.internal:9997/v1/audio/transcriptions"
+  - name: "model"
+    type: "string"
+    required: true
+    label:
+      en_US: "Model"
+    form: "form"
+    human_description:
+      en_US: "Whisper-compatible model name or deployed model UID."
+    default: "whisper-large-v3-turbo"
+  - name: "response_format"
+    type: "select"
+    required: true
+    label:
+      en_US: "API Response Format"
+    form: "form"
+    human_description:
+      en_US: "JSON matches the current workflow. Verbose JSON can include timestamps when supported by the server."
+    options:
+      - value: "json"
+        label:
+          en_US: "JSON (default)"
+      - value: "verbose_json"
+        label:
+          en_US: "Verbose JSON"
+      - value: "text"
+        label:
+          en_US: "Plain text"
+    default: "json"
+  - name: "temperature"
+    type: "number"
+    required: false
+    label:
+      en_US: "Temperature"
+    form: "form"
+    human_description:
+      en_US: "Sampling temperature from 0 to 1; default 0.5."
+    default: 0.5
+    min: 0
+    max: 1
+  - name: "language"
+    type: "string"
+    required: false
+    label:
+      en_US: "Language Hint"
+    form: "llm"
+    human_description:
+      en_US: "Optional ISO language hint, such as en, it or de. Empty means server auto-detection."
+    llm_description: "Optional spoken-language code; omit for automatic language detection."
+  - name: "prompt"
+    type: "string"
+    required: false
+    label:
+      en_US: "Transcription Prompt"
+    form: "llm"
+    human_description:
+      en_US: "Optional vocabulary or context hint supported by the endpoint."
+    llm_description: "Optional speech recognition context or vocabulary hint; not an instruction to summarize."
+  - name: "conversion_mode"
+    type: "select"
+    required: true
+    label:
+      en_US: "Audio Conversion"
+    form: "form"
+    human_description:
+      en_US: "Auto passes MP3/WAV/M4A/FLAC audio through and converts other inputs or video. Always forces conversion; Never sends the original bytes."
+    options:
+      - value: "auto"
+        label:
+          en_US: "Auto"
+      - value: "always"
+        label:
+          en_US: "Always convert"
+      - value: "never"
+        label:
+          en_US: "Never convert"
+    default: "auto"
+  - name: "conversion_format"
+    type: "select"
+    required: true
+    label:
+      en_US: "Converted Audio Format"
+    form: "form"
+    human_description:
+      en_US: "MP3: compact 64 kbps; WAV: PCM. Both use mono 16 kHz speech audio."
+    options:
+      - value: "mp3"
+        label:
+          en_US: "MP3"
+      - value: "wav"
+        label:
+          en_US: "WAV"
+    default: "mp3"
+  - name: "timeout"
+    type: "number"
+    required: false
+    label:
+      en_US: "Timeout (seconds)"
+    form: "form"
+    human_description:
+      en_US: "Download wall-clock, conversion and transcription timeout per phase, from 10 to 3600 seconds."
+    default: 600
+    min: 10
+    max: 3600
+  - name: "max_input_mb"
+    type: "number"
+    required: false
+    label:
+      en_US: "Maximum Input Size (MB)"
+    form: "form"
+    human_description:
+      en_US: "Download limit before transcription or conversion. Decimal MB; default 1000."
+    default: 1000
+    min: 1
+    max: 2048
+  - name: "max_audio_mb"
+    type: "number"
+    required: false
+    label:
+      en_US: "Maximum Submitted Audio Size (MB)"
+    form: "form"
+    human_description:
+      en_US: "Limit for the final submitted file, converted or original. Exceeding the limit fails rather than truncating audio."
+    default: 200
+    min: 1
+    max: 1024
+extra:
+  python:
+    source: "tools/transcribe.py"
+output_schema:
+  type: object
+  properties:
+    transcript:
+      type: string
+      description: "Transcription text for downstream text or Answer nodes."
+    language:
+      type: string
+      description: "Server-returned language, or empty when unavailable."
+    segments:
+      type: array
+      items:
+        type: object
+      description: "Server-returned segments; no timestamps are fabricated."
+    words:
+      type: array
+      items:
+        type: object
+      description: "Server-returned word timestamps when available."

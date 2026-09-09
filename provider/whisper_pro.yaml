@@ -1,0 +1,25 @@
+identity:
+  author: "erbanku"
+  name: "whisper-pro"
+  label:
+    en_US: "Whisper Pro"
+  description:
+    en_US: "Transcribe audio or video from Dify files or URLs with bundled FFmpeg and configurable Whisper-compatible endpoints."
+  icon: "icon.svg"
+  tags:
+    - "utilities"
+tools:
+  - "tools/transcribe.yaml"
+extra:
+  python:
+    source: "provider/whisper_pro.py"
+credentials_for_provider:
+  api_key:
+    type: "secret-input"
+    required: false
+    label:
+      en_US: "API Key (optional)"
+    placeholder:
+      en_US: "Leave blank for your local unauthenticated endpoint"
+    help:
+      en_US: "Optional Bearer token. Sent only to the configured transcription endpoint, never to media downloads."
