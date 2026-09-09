@@ -7,6 +7,9 @@ label:
 description:
   en_US: "Transcribe audio or video from Dify files or URLs with bundled FFmpeg and configurable Whisper-compatible endpoints."
 icon: "icon.svg"
+privacy: PRIVACY.md
+repo: https://github.com/erbanku/whisper-pro
+contact: 79493862+erbanku@users.noreply.github.com
 resource:
   memory: 536870912
   permission:
